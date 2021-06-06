@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import software.bernie.techarium.recipes.AbstractMachineRecipe;
@@ -34,13 +35,19 @@ public class BotariumRecipe extends AbstractMachineRecipe {
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return output.copy();
     }
+
 
     @Override
     public IRecipeSerializer<?> getSerializer() {
         return BOTARIUM_SERIALIZER.get();
+    }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
     }
 
     @Override
@@ -54,13 +61,21 @@ public class BotariumRecipe extends AbstractMachineRecipe {
         }
 
         @Override
-        public void serialize(JsonObject json) {
-            super.serialize(json);
-            json.add("cropIn", getCropType().serialize());
-            json.add("soilIn", getSoilIn().serialize());
+        public void serializeRecipeData(JsonObject json) {
+            super.serializeRecipeData(json);
+            json.add("cropIn", getCropType().toJson());
+            json.add("soilIn", getSoilIn().toJson());
             json.add("fluidIn", JsonCodecUtils.serialize(getFluidIn()));
-            json.add("output", JsonCodecUtils.serialize(getRecipeOutput()));
+            json.add("output", JsonCodecUtils.serialize(getResultItem()));
         }
     }
 
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> ingredients = super.getIngredients();
+        if (soilIn != null) ingredients.add(soilIn);
+        if (cropType != null) ingredients.add(cropType);
+        if (cropType != null) ingredients.add(cropType);
+        return ingredients;
+    }
 }

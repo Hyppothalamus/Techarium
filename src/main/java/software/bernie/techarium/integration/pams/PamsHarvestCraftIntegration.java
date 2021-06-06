@@ -21,6 +21,10 @@ import software.bernie.techarium.registry.TagRegistry;
 import java.util.function.Consumer;
 
 public class PamsHarvestCraftIntegration extends Integration {
+    public PamsHarvestCraftIntegration(String modID) {
+        super(modID);
+    }
+
     @Override
     public void generateRecipes(Consumer<IFinishedRecipe> consumer) {
         for (Item item : ForgeRegistries.ITEMS) {
@@ -29,15 +33,15 @@ public class PamsHarvestCraftIntegration extends Integration {
                 Block block = seed.getBlock();
                 Item drop = getPamsDropFromCrop(block);
                 BotariumRecipe.builder()
-                        .cropType(Ingredient.fromStacks(new ItemStack(seed)))
-                        .soilIn(Ingredient.fromTag(TagRegistry.DIRT))
+                        .cropType(Ingredient.of(new ItemStack(seed)))
+                        .soilIn(Ingredient.of(TagRegistry.DIRT))
                         .fluidIn(new FluidStack(Fluids.WATER, 1000))
                         .maxProgress(1000)
                         .rfPerTick(10)
                         .progressPerTick(1)
                         .output(new ItemStack(drop, 1))
                         .construct()
-                        .addCondition(new ModLoadedCondition(ModIntegrations.MYSTICAL.getModID()))
+                        .addCondition(new ModLoadedCondition(ModIntegrations.getPams().orElseThrow(NullPointerException::new).getModID()))
                         .build(consumer,
                                 new ResourceLocation(Techarium.ModID,
                                         "botarium/pams/" + seed.getRegistryName().getPath()));

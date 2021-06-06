@@ -19,21 +19,25 @@ import software.bernie.techarium.registry.TagRegistry;
 import java.util.function.Consumer;
 
 public class MysticalAgricultureIntegration extends Integration {
+    public MysticalAgricultureIntegration(String modID) {
+        super(modID);
+    }
+
     @Override
     public void generateRecipes(Consumer<IFinishedRecipe> consumer) {
         for (Item item : ForgeRegistries.ITEMS) {
             if (item instanceof MysticalSeedsItem) {
                 MysticalSeedsItem mysticalSeed = (MysticalSeedsItem) item;
                 BotariumRecipe.builder()
-                        .cropType(Ingredient.fromStacks(new ItemStack(mysticalSeed)))
-                        .soilIn(Ingredient.fromTag(TagRegistry.DIRT))
+                        .cropType(Ingredient.of(new ItemStack(mysticalSeed)))
+                        .soilIn(Ingredient.of(TagRegistry.DIRT))
                         .fluidIn(new FluidStack(Fluids.WATER, 1000))
                         .maxProgress(2000)
                         .rfPerTick(30)
                         .progressPerTick(1)
                         .output(new ItemStack(mysticalSeed.getCrop().getEssence(), 1))
                         .construct()
-                        .addCondition(new ModLoadedCondition(ModIntegrations.MYSTICAL.getModID()))
+                        .addCondition(new ModLoadedCondition(ModIntegrations.getMystical().orElseThrow(NullPointerException::new).getModID()))
                         .build(consumer,
                                 new ResourceLocation(Techarium.ModID, "botarium/mystical/" + mysticalSeed.getRegistryName().getPath()));
             }

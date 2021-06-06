@@ -55,13 +55,19 @@ public class BlockRegistryObjectGroup<B extends Block, I extends Item, T extends
         return this;
     }
 
+    public BlockRegistryObjectGroup<B, I, T> registerWithoutItem(DeferredRegister<Block> blockRegistry, DeferredRegister<TileEntityType<?>> tileRegistry) {
+        block = blockRegistry.register(name, blockCreator);
+        tileEntity = tileRegistry.register(name, () -> TileEntityType.Builder.of(tileSupplier, this.getBlock())
+                .build(null));
+        return this;
+    }
     @SuppressWarnings("ConstantConditions")
     public BlockRegistryObjectGroup<B, I, T> register(DeferredRegister<Block> blockRegistry,
                                                       DeferredRegister<Item> itemRegistry,
                                                       DeferredRegister<TileEntityType<?>> tileEntityTypeRegistry) {
         this.register(blockRegistry, itemRegistry);
         if (tileSupplier != null) {
-            tileEntity = tileEntityTypeRegistry.register(name, () -> TileEntityType.Builder.create(tileSupplier, this.getBlock())
+            tileEntity = tileEntityTypeRegistry.register(name, () -> TileEntityType.Builder.of(tileSupplier, this.getBlock())
                     .build(null));
         }
         return this;
